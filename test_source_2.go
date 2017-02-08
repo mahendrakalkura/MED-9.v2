@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/getsentry/raven-go"
 )
 
 func test_source_2(settings *Settings) {
@@ -19,6 +20,7 @@ func test_source_2(settings *Settings) {
 
 	source_2, err := get_source_2(settings, record.Street, record.Number, record.Zip, record.City)
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		panic(err)
 	}
 	fmt.Println("Amt    :", source_2.Offices[0].Amt)

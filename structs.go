@@ -6,12 +6,17 @@ import (
 
 type Settings struct {
 	Proxies SettingsProxies `toml:"proxies"`
+	Sentry  SettingsSentry  `toml:"sentry"`
 	SQLX    SettingsSQLX    `toml:"sqlx"`
 }
 
 type SettingsProxies struct {
 	Hostname string `toml:"hostname"`
 	Ports    []int  `toml:"ports"`
+}
+
+type SettingsSentry struct {
+	Dsn string `toml:"dsn"`
 }
 
 type SettingsSQLX struct {
@@ -57,32 +62,28 @@ type Record struct {
 }
 
 type Source11 struct {
-	Data []Source11Data `json:"data"`
+	TotalHits int            `json:"totalHits"`
+	Data      []Source11Data `json:"data"`
 }
 
 type Source11Data struct {
-	Aktiv                                 bool                                `json:"Aktiv"`
-	AlternativeSuchbegriffe               Source11DataAlternativeSuchbegriffe `json:"AlternativeSuchbegriffe"`
-	AlternativeSuchbegriffeAsSearchString string                              `json:"AlternativeSuchbegriffeAsSearchString"`
-	AlternativeSuchbegriffeAsString       string                              `json:"AlternativeSuchbegriffeAsString"`
-	BfsNr                                 string                              `json:"BfsNr"`
-	HausKey                               int                                 `json:"HausKey"`
-	HausNummer                            int                                 `json:"HausNummer"`
-	HausNummerAlpha                       string                              `json:"HausNummerAlpha"`
-	Kanton                                string                              `json:"Kanton"`
-	Land                                  string                              `json:"Land"`
-	NameComplete                          string                              `json:"NameComplete"`
-	Onrp                                  string                              `json:"Onrp"`
-	Ort                                   string                              `json:"Ort"`
-	Postleitzahl                          string                              `json:"Postleitzahl"`
-	Quartier                              string                              `json:"Quartier"`
-	SprachCode                            string                              `json:"SprachCode"`
-	Stadtkreis                            string                              `json:"Stadtkreis"`
-	StrassenName                          string                              `json:"StrassenName"`
-}
-
-type Source11DataAlternativeSuchbegriffe struct {
-	String string `json:"string"`
+	Aktiv                                 bool   `json:"Aktiv"`
+	AlternativeSuchbegriffeAsSearchString string `json:"AlternativeSuchbegriffeAsSearchString"`
+	AlternativeSuchbegriffeAsString       string `json:"AlternativeSuchbegriffeAsString"`
+	BfsNr                                 string `json:"BfsNr"`
+	HausKey                               int    `json:"HausKey"`
+	HausNummer                            int    `json:"HausNummer"`
+	HausNummerAlpha                       string `json:"HausNummerAlpha"`
+	Kanton                                string `json:"Kanton"`
+	Land                                  string `json:"Land"`
+	NameComplete                          string `json:"NameComplete"`
+	Onrp                                  string `json:"Onrp"`
+	Ort                                   string `json:"Ort"`
+	Postleitzahl                          string `json:"Postleitzahl"`
+	Quartier                              string `json:"Quartier"`
+	SprachCode                            string `json:"SprachCode"`
+	Stadtkreis                            string `json:"Stadtkreis"`
+	StrassenName                          string `json:"StrassenName"`
 }
 
 type Source12 struct {
@@ -92,6 +93,7 @@ type Source12 struct {
 
 type Source2 struct {
 	Offices []Source2Office `json:"offices"`
+	Code    *int            `json:"code,omitempty"`
 }
 
 type Source2Office struct {

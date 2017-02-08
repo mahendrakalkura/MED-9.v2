@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
+	"github.com/getsentry/raven-go"
 	"github.com/lib/pq"
 	"io"
 	"os"
@@ -16,11 +17,13 @@ func insert(settings *Settings) {
 
 	transaction, err := database.Begin()
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		panic(err)
 	}
 
 	statement, err := transaction.Prepare(pq.CopyIn("records", "zip", "city", "street", "number"))
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		panic(err)
 	}
 
@@ -36,22 +39,26 @@ func insert(settings *Settings) {
 		}
 		_, err = statement.Exec(record[0], record[1], record[2], record[3])
 		if err != nil {
+			raven.CaptureErrorAndWait(err, nil)
 			panic(err)
 		}
 	}
 
 	_, err = statement.Exec()
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		panic(err)
 	}
 
 	err = statement.Close()
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		panic(err)
 	}
 
 	err = transaction.Commit()
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		panic(err)
 	}
 }

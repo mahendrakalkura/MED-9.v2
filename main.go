@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"github.com/getsentry/raven-go"
 )
 
 func main() {
@@ -12,6 +13,8 @@ func main() {
 	var settings *Settings
 
 	settings = get_settings()
+
+	raven.SetDSN(settings.Sentry.Dsn)
 
 	if *action == "bootstrap" {
 		bootstrap(settings)

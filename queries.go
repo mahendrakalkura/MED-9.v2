@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"github.com/getsentry/raven-go"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -17,6 +18,7 @@ func select_source_1_random(database *sqlx.DB) Record {
     `
 	err := database.Get(&record, query)
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		panic(err)
 	}
 	return record
@@ -34,6 +36,7 @@ func select_source_2_random(database *sqlx.DB) Record {
     `
 	err := database.Get(&record, query)
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		panic(err)
 	}
 	return record
