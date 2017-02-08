@@ -1,0 +1,10 @@
+[proxies]
+hostname = "..."
+ports = [..., ...]
+
+[sqlx]
+database = "MED-9"
+hostname = "0.0.0.0"
+password = "..."
+port = "5432"
+username = "..."
