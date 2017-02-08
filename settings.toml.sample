@@ -1,6 +1,6 @@
 [proxies]
-hostname = ""
-ports = []
+hostname = "..."
+ports = [..., ...]
 
 [sentry]
 dsn = "..."
