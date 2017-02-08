@@ -1,15 +1,15 @@
 package main
 
 import (
-	"fmt"
+    "fmt"
 )
 
 func bootstrap(settings *Settings) {
-	fmt.Println("bootstrap()")
+    fmt.Println("bootstrap()")
 
-	database := get_database(settings)
+    database := get_database(settings)
 
-	schema := `
+    statement := `
     DROP SCHEMA IF EXISTS public CASCADE;
 
     CREATE SCHEMA IF NOT EXISTS public;
@@ -64,7 +64,7 @@ func bootstrap(settings *Settings) {
     CREATE INDEX records_city ON records USING btree (city);
     `
 
-	defer database.Close()
+    defer database.Close()
 
-	database.MustExec(schema)
+    database.MustExec(statement)
 }

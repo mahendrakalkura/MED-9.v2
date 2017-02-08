@@ -24,28 +24,24 @@ func main() {
 		insert(settings)
 	}
 
-	if *action == "test_source_1" {
-		test_source_1(settings)
+	if *action == "source_1_one" {
+		source_1_one(settings)
 	}
 
-	if *action == "test_source_2" {
-		test_source_2(settings)
+	if *action == "source_2_one" {
+		source_2_one(settings)
 	}
 
-	if *action == "queue_1" {
-		queue_1(settings)
+	if *action == "source_1_all" {
+		source_1_all(settings)
 	}
 
-	if *action == "queue_2" {
-		queue_2(settings)
+	if *action == "source_2_all" {
+		source_2_all(settings)
 	}
 
-	if *action == "workers_1" {
-		workers_1(settings)
-	}
-
-	if *action == "workers_2" {
-		workers_2(settings)
+	if *action == "progress" {
+		progress(settings)
 	}
 
 	if *action == "report" {

@@ -35,7 +35,7 @@ func get_database(settings *Settings) *sqlx.DB {
 func get_http_client(settings *Settings) *http.Client {
 	client := &http.Client{}
 
-	timeout := time.Duration(30 * time.Second)
+	timeout := time.Duration(60 * time.Second)
 	client.Timeout = timeout
 
 	if len(settings.Proxies.Hostname) > 0 && len(settings.Proxies.Ports) > 0 {
@@ -72,7 +72,7 @@ func get_settings() *Settings {
 }
 
 func get_source_1(
-	settings *Settings, street string, number string, zip string, city string, amt string,
+	settings *Settings, street string, number string, zip string, city string, amt []string,
 ) (Source12, error) {
 	var source_1_1 Source11
 	var source_1_2 Source12
@@ -163,7 +163,7 @@ func get_source_1(
 	data.Add("addressObject[SprachCode]", Data.SprachCode)
 	data.Add("addressObject[Stadtkreis]", Data.Stadtkreis)
 	data.Add("addressObject[StrassenName]", Data.StrassenName)
-	data.Add("amtTyp", amt)
+	data.Add("amtTyp", amt[1])
 
 	request, err = http.NewRequest(
 		"POST",
