@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/getsentry/raven-go"
 	"github.com/lib/pq"
+	"gopkg.in/cheggaaa/pb.v1"
 	"io"
 	"os"
 )
@@ -28,7 +29,17 @@ func insert(settings *Settings) {
 	}
 
 	file, _ := os.Open("ADR461.CSV")
-	buffer := bufio.NewReader(file)
+
+	stat, stat_err := file.Stat()
+	if stat_err != nil {
+		raven.CaptureErrorAndWait(stat_err, nil)
+		panic(stat_err)
+	}
+
+	bar := pb.New(int(stat.Size())).SetUnits(pb.U_BYTES)
+	bar.Start()
+	proxy := bar.NewProxyReader(file)
+	buffer := bufio.NewReader(proxy)
 	resource := csv.NewReader(buffer)
 	resource.Comma = ';'
 	resource.Read()
