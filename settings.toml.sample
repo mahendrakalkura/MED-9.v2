@@ -1,6 +1,9 @@
 [proxies]
-hostname = "..."
-ports = [..., ...]
+hostname = ""
+ports = []
+
+[sentry]
+dsn = "..."
 
 [sqlx]
 database = "MED-9"
