@@ -31,7 +31,6 @@ func source_1_one_goroutine(settings *Settings, record Record, typ []string) {
 	source_1_2, err := get_source_1(settings, record.Street, record.Number, record.Zip, record.City, typ)
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
 	}
 	fmt.Printf("%-27s Amt    : %s\n", typ[2], source_1_2.Amt)
 	fmt.Printf("%-27s SedexId: %s\n", typ[2], source_1_2.SedexId)

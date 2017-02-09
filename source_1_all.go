@@ -35,10 +35,10 @@ func source_1_all_consumer(settings *Settings, records_and_typs_channel chan Rec
 		source_2, err := get_source_1(settings, record.Street, record.Number, record.Zip, record.City, typ)
 		if err != nil {
 			raven.CaptureErrorAndWait(err, nil)
-			panic(err)
+		} else {
+			database := get_database(settings)
+			source_1_update(database, typ, record, source_2)
 		}
-		database := get_database(settings)
-		source_1_update(database, typ, record, source_2)
 	}
 }
 
@@ -52,14 +52,14 @@ func source_1_all_producer(settings *Settings, records_and_typs_channel chan Rec
 			struct_scan_err := rows.StructScan(&record)
 			if struct_scan_err != nil {
 				raven.CaptureErrorAndWait(struct_scan_err, nil)
-				panic(struct_scan_err)
+			} else {
+				record_and_typ := RecordAndTyp{
+					Record: record,
+					Typ:    typ,
+				}
+				records_and_typs_channel <- record_and_typ
+				progress_bar.Increment()
 			}
-			record_and_typ := RecordAndTyp{
-				Record: record,
-				Typ:    typ,
-			}
-			records_and_typs_channel <- record_and_typ
-			progress_bar.Increment()
 		}
 	}
 }

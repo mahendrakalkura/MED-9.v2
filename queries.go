@@ -15,7 +15,6 @@ func records_select_total(database *sqlx.DB) int64 {
 	err := row.Scan(&total)
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
 	}
 	return total
 }
@@ -34,7 +33,6 @@ func records_select_report_total(database *sqlx.DB) int {
 	err := row.Scan(&total)
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
 	}
 	return total
 }
@@ -52,7 +50,6 @@ func records_select_report_records(database *sqlx.DB) *sqlx.Rows {
 	rows, err := database.Queryx(statement)
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
 	}
 	return rows
 }
@@ -71,7 +68,6 @@ func source_1_select_progress(database *sqlx.DB, typ []string, total int64) (str
 	err := row.Scan(&pending)
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
 	}
 
 	pending_string := fmt.Sprintf("%07s", strconv.FormatInt(pending, 10))
@@ -97,7 +93,6 @@ func source_1_select_all(database *sqlx.DB, typ []string) (int, *sqlx.Rows) {
 	err_total := row_total.Scan(&total)
 	if err_total != nil {
 		raven.CaptureErrorAndWait(err_total, nil)
-		panic(err_total)
 	}
 
 	query_star := `
@@ -107,10 +102,9 @@ func source_1_select_all(database *sqlx.DB, typ []string) (int, *sqlx.Rows) {
     ORDER BY id ASC
     `
 	statement_star := fmt.Sprintf(query_star, typ[0], typ[0])
-	rows, err := database.Queryx(statement_star)
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
+	rows, queryx_err := database.Queryx(statement_star)
+	if queryx_err != nil {
+		raven.CaptureErrorAndWait(queryx_err, nil)
 	}
 	return total, rows
 }
@@ -128,7 +122,6 @@ func source_1_select_one(database *sqlx.DB) Record {
 	err := database.Get(&record, statement)
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
 	}
 	return record
 }
@@ -206,7 +199,6 @@ func source_2_select_progress(database *sqlx.DB, total int64) (string, string, s
 	err := row.Scan(&pending)
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
 	}
 
 	pending_string := fmt.Sprintf("%07s", strconv.FormatInt(pending, 10))
@@ -231,7 +223,6 @@ func source_2_select_all(database *sqlx.DB) (int, *sqlx.Rows) {
 	err_total := row_total.Scan(&total)
 	if err_total != nil {
 		raven.CaptureErrorAndWait(err_total, nil)
-		panic(err_total)
 	}
 
 	statement_star := `
@@ -240,10 +231,9 @@ func source_2_select_all(database *sqlx.DB) (int, *sqlx.Rows) {
     WHERE tilbago_k_infinity_com_amt IS NULL AND tilbago_k_infinity_com_sedex_id IS NULL
     ORDER BY id ASC
     `
-	rows, err := database.Queryx(statement_star)
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
+	rows, queryx_err := database.Queryx(statement_star)
+	if queryx_err != nil {
+		raven.CaptureErrorAndWait(queryx_err, nil)
 	}
 	return total, rows
 }
@@ -261,7 +251,6 @@ func source_2_select_one(database *sqlx.DB) Record {
 	err := database.Get(&record, statement)
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
 	}
 	return record
 }

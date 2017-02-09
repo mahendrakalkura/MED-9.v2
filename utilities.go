@@ -43,7 +43,6 @@ func get_http_client(settings *Settings) *http.Client {
 		proxy_url, err := url.Parse(proxy)
 		if err != nil {
 			raven.CaptureErrorAndWait(err, nil)
-			panic(err)
 		}
 		client.Transport = &http.Transport{Proxy: http.ProxyURL(proxy_url)}
 	}
@@ -92,7 +91,6 @@ func get_source_1(
 	)
 	if new_request_1_err != nil {
 		raven.CaptureErrorAndWait(new_request_1_err, nil)
-		panic(new_request_1_err)
 		return source_1_2, errors.New("new_request_1_err")
 	}
 
@@ -107,7 +105,6 @@ func get_source_1(
 	response_1, do_1_err := client.Do(request_1)
 	if do_1_err != nil {
 		raven.CaptureErrorAndWait(do_1_err, nil)
-		panic(do_1_err)
 		return source_1_2, errors.New("do_1_err")
 	}
 
@@ -116,7 +113,6 @@ func get_source_1(
 	new_decoder_err := json.NewDecoder(response_1.Body).Decode(&source_1_1)
 	if new_decoder_err != nil {
 		raven.CaptureErrorAndWait(new_decoder_err, nil)
-		panic(new_decoder_err)
 		return source_1_2, errors.New("new_decoder_err")
 	}
 
@@ -163,7 +159,6 @@ func get_source_1(
 	)
 	if new_request_2_err != nil {
 		raven.CaptureErrorAndWait(new_request_2_err, nil)
-		panic(new_request_2_err)
 		return source_1_2, errors.New("new_request_2_err")
 	}
 
@@ -178,7 +173,6 @@ func get_source_1(
 	response_2, do_2_err := client.Do(request_2)
 	if do_2_err != nil {
 		raven.CaptureErrorAndWait(do_2_err, nil)
-		panic(do_2_err)
 		return source_1_2, errors.New("do_2_err")
 	}
 
@@ -187,7 +181,6 @@ func get_source_1(
 	body_bytes, read_all_err := ioutil.ReadAll(response_2.Body)
 	if read_all_err != nil {
 		raven.CaptureErrorAndWait(read_all_err, nil)
-		panic(read_all_err)
 		return source_1_2, errors.New("read_all_err")
 	}
 
@@ -197,7 +190,6 @@ func get_source_1(
 	root, parse_html_err := xmlpath.ParseHTML(reader)
 	if parse_html_err != nil {
 		raven.CaptureErrorAndWait(parse_html_err, nil)
-		panic(parse_html_err)
 		return source_1_2, errors.New("parse_html_err")
 	}
 
@@ -226,7 +218,6 @@ func get_source_2(settings *Settings, street string, number string, zip string, 
 	request, new_request_err := http.NewRequest("GET", "http://tilbago.k-infinity.com:2607/dev/amtinfo", nil)
 	if new_request_err != nil {
 		raven.CaptureErrorAndWait(new_request_err, nil)
-		panic(new_request_err)
 		return source_2, errors.New("new_request_err")
 	}
 
@@ -243,7 +234,6 @@ func get_source_2(settings *Settings, street string, number string, zip string, 
 	response, do_err := client.Do(request)
 	if do_err != nil {
 		raven.CaptureErrorAndWait(do_err, nil)
-		panic(do_err)
 		return source_2, errors.New("do_err")
 	}
 
@@ -252,7 +242,6 @@ func get_source_2(settings *Settings, street string, number string, zip string, 
 	new_decoder_err := json.NewDecoder(response.Body).Decode(&source_2)
 	if new_decoder_err != nil {
 		raven.CaptureErrorAndWait(new_decoder_err, nil)
-		panic(new_decoder_err)
 		return source_2, errors.New("new_decoder_err")
 	}
 

@@ -19,7 +19,6 @@ func source_2_one(settings *Settings) {
 	source_2, err := get_source_2(settings, record.Street, record.Number, record.Zip, record.City)
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
 	}
 	fmt.Printf("%-7s: %s\n", "Amt", source_2.Offices[0].Amt)
 	fmt.Printf("%-7s: %s\n", "SedexId", source_2.Offices[0].SedexId)
