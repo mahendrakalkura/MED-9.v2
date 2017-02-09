@@ -58,8 +58,8 @@ func source_1_all_producer(settings *Settings, records_and_typs_channel chan Rec
 					Typ:    typ,
 				}
 				records_and_typs_channel <- record_and_typ
-				progress_bar.Increment()
 			}
+			progress_bar.Increment()
 		}
 	}
 }
