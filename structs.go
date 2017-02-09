@@ -8,6 +8,7 @@ type Settings struct {
 	Proxies SettingsProxies `toml:"proxies"`
 	Sentry  SettingsSentry  `toml:"sentry"`
 	SQLX    SettingsSQLX    `toml:"sqlx"`
+	Others  SettingsOthers  `toml:"others"`
 }
 
 type SettingsProxies struct {
@@ -25,6 +26,10 @@ type SettingsSQLX struct {
 	Password string `toml:"password"`
 	Port     string `toml:"port"`
 	Username string `toml:"username"`
+}
+
+type SettingsOthers struct {
+	Consumers int `toml:"consumers"`
 }
 
 type Record struct {
@@ -59,6 +64,11 @@ type Record struct {
 	EgeliInformatikChMsoSedexId  sql.NullString `db:"egeli_informatik_ch_mso_sedex_id"`
 	TilbagoKInfinityComAmt       sql.NullString `db:"tilbago_k_infinity_com_amt"`
 	TilbagoKInfinityComSedexId   sql.NullString `db:"tilbago_k_infinity_com_sedex_id"`
+}
+
+type RecordAndTyp struct {
+	Record Record
+	Typ    []string
 }
 
 type Source11 struct {

@@ -85,7 +85,7 @@ func source_1_select_progress(database *sqlx.DB, typ []string, total int64) (str
 	return source, completed_string, pending_string, percentage_string
 }
 
-func source_1_select_all(database *sqlx.DB, typ string) (int64, *sqlx.Rows) {
+func source_1_select_all(database *sqlx.DB, typ []string) (int, *sqlx.Rows) {
 	query_total := `
     SELECT COUNT(id)
     FROM records
@@ -93,7 +93,7 @@ func source_1_select_all(database *sqlx.DB, typ string) (int64, *sqlx.Rows) {
     `
 	statement_total := fmt.Sprintf(query_total, typ[0], typ[0])
 	row_total := database.QueryRow(statement_total)
-	var total int64
+	var total int
 	err_total := row_total.Scan(&total)
 	if err_total != nil {
 		raven.CaptureErrorAndWait(err_total, nil)
@@ -135,61 +135,61 @@ func source_1_select_one(database *sqlx.DB) Record {
 
 func source_1_update(database *sqlx.DB, typ []string, record Record, source_1_2 Source12) {
 	if typ[1] == "BO" {
-		record.EgeliInformatikChBoAmt = sql.NullString{String: source_1_2.Amt}
-		record.EgeliInformatikChBoSedexId = sql.NullString{String: source_1_2.SedexId}
+		record.EgeliInformatikChBoAmt = sql.NullString{String: source_1_2.Amt, Valid: true}
+		record.EgeliInformatikChBoSedexId = sql.NullString{String: source_1_2.SedexId, Valid: true}
 	}
 	if typ[1] == "CF" {
-		record.EgeliInformatikChBoAmt = sql.NullString{String: source_1_2.Amt}
-		record.EgeliInformatikChBoSedexId = sql.NullString{String: source_1_2.SedexId}
+		record.EgeliInformatikChCfAmt = sql.NullString{String: source_1_2.Amt, Valid: true}
+		record.EgeliInformatikChCfSedexId = sql.NullString{String: source_1_2.SedexId, Valid: true}
 	}
 	if typ[1] == "CO" {
-		record.EgeliInformatikChCoAmt = sql.NullString{String: source_1_2.Amt}
-		record.EgeliInformatikChCoSedexId = sql.NullString{String: source_1_2.SedexId}
+		record.EgeliInformatikChCoAmt = sql.NullString{String: source_1_2.Amt, Valid: true}
+		record.EgeliInformatikChCoSedexId = sql.NullString{String: source_1_2.SedexId, Valid: true}
 	}
 	if typ[1] == "COR" {
-		record.EgeliInformatikChCorAmt = sql.NullString{String: source_1_2.Amt}
-		record.EgeliInformatikChCorSedexId = sql.NullString{String: source_1_2.SedexId}
+		record.EgeliInformatikChCorAmt = sql.NullString{String: source_1_2.Amt, Valid: true}
+		record.EgeliInformatikChCorSedexId = sql.NullString{String: source_1_2.SedexId, Valid: true}
 	}
 	if typ[1] == "DC" {
-		record.EgeliInformatikChDcAmt = sql.NullString{String: source_1_2.Amt}
-		record.EgeliInformatikChDcSedexId = sql.NullString{String: source_1_2.SedexId}
+		record.EgeliInformatikChDcAmt = sql.NullString{String: source_1_2.Amt, Valid: true}
+		record.EgeliInformatikChDcSedexId = sql.NullString{String: source_1_2.SedexId, Valid: true}
 	}
 	if typ[1] == "EIHI" {
-		record.EgeliInformatikChEihiAmt = sql.NullString{String: source_1_2.Amt}
-		record.EgeliInformatikChEihiSedexId = sql.NullString{String: source_1_2.SedexId}
+		record.EgeliInformatikChEihiAmt = sql.NullString{String: source_1_2.Amt, Valid: true}
+		record.EgeliInformatikChEihiSedexId = sql.NullString{String: source_1_2.SedexId, Valid: true}
 	}
 	if typ[1] == "IC" {
-		record.EgeliInformatikChIcAmt = sql.NullString{String: source_1_2.Amt}
-		record.EgeliInformatikChIcSedexId = sql.NullString{String: source_1_2.SedexId}
+		record.EgeliInformatikChIcAmt = sql.NullString{String: source_1_2.Amt, Valid: true}
+		record.EgeliInformatikChIcSedexId = sql.NullString{String: source_1_2.SedexId, Valid: true}
 	}
 	if typ[1] == "JP" {
-		record.EgeliInformatikChJpAmt = sql.NullString{String: source_1_2.Amt}
-		record.EgeliInformatikChJpSedexId = sql.NullString{String: source_1_2.SedexId}
+		record.EgeliInformatikChJpAmt = sql.NullString{String: source_1_2.Amt, Valid: true}
+		record.EgeliInformatikChJpSedexId = sql.NullString{String: source_1_2.SedexId, Valid: true}
 	}
 	if typ[1] == "LRO" {
-		record.EgeliInformatikChLroAmt = sql.NullString{String: source_1_2.Amt}
-		record.EgeliInformatikChLroSedexId = sql.NullString{String: source_1_2.SedexId}
+		record.EgeliInformatikChLroAmt = sql.NullString{String: source_1_2.Amt, Valid: true}
+		record.EgeliInformatikChLroSedexId = sql.NullString{String: source_1_2.SedexId, Valid: true}
 	}
 	if typ[1] == "MSO" {
-		record.EgeliInformatikChMsoAmt = sql.NullString{String: source_1_2.Amt}
-		record.EgeliInformatikChMsoSedexId = sql.NullString{String: source_1_2.SedexId}
+		record.EgeliInformatikChMsoAmt = sql.NullString{String: source_1_2.Amt, Valid: true}
+		record.EgeliInformatikChMsoSedexId = sql.NullString{String: source_1_2.SedexId, Valid: true}
 	}
 	if typ[1] == "RO" {
-		record.EgeliInformatikChRoAmt = sql.NullString{String: source_1_2.Amt}
-		record.EgeliInformatikChRoSedexId = sql.NullString{String: source_1_2.SedexId}
+		record.EgeliInformatikChRoAmt = sql.NullString{String: source_1_2.Amt, Valid: true}
+		record.EgeliInformatikChRoSedexId = sql.NullString{String: source_1_2.SedexId, Valid: true}
 	}
 	if typ[1] == "SAO" {
-		record.EgeliInformatikChSaoAmt = sql.NullString{String: source_1_2.Amt}
-		record.EgeliInformatikChSaoSedexId = sql.NullString{String: source_1_2.SedexId}
+		record.EgeliInformatikChSaoAmt = sql.NullString{String: source_1_2.Amt, Valid: true}
+		record.EgeliInformatikChSaoSedexId = sql.NullString{String: source_1_2.SedexId, Valid: true}
 	}
-	statement := `
+	query := `
     UPDATE records
     SET
         egeli_informatik_ch_%s_amt = :egeli_informatik_ch_%s_amt,
         egeli_informatik_ch_%s_sedex_id = :egeli_informatik_ch_%s_sedex_id
     WHERE id = :id
     `
-	statement = fmt.Sprintf(statement, typ[0], typ[0])
+	statement := fmt.Sprintf(query, typ[0], typ[0], typ[0], typ[0])
 	database.NamedExec(statement, record)
 }
 
@@ -220,14 +220,14 @@ func source_2_select_progress(database *sqlx.DB, total int64) (string, string, s
 	return source, completed_string, pending_string, percentage_string
 }
 
-func source_2_select_all(database *sqlx.DB) (int64, *sqlx.Rows) {
+func source_2_select_all(database *sqlx.DB) (int, *sqlx.Rows) {
 	statement_total := `
     SELECT COUNT(id)
     FROM records
     WHERE tilbago_k_infinity_com_amt IS NULL AND tilbago_k_infinity_com_sedex_id IS NULL
     `
 	row_total := database.QueryRow(statement_total)
-	var total int64
+	var total int
 	err_total := row_total.Scan(&total)
 	if err_total != nil {
 		raven.CaptureErrorAndWait(err_total, nil)
@@ -267,8 +267,8 @@ func source_2_select_one(database *sqlx.DB) Record {
 }
 
 func source_2_update(database *sqlx.DB, record Record, source_2 Source2) {
-	record.TilbagoKInfinityComAmt = sql.NullString{String: source_2.Offices[0].Amt}
-	record.TilbagoKInfinityComSedexId = sql.NullString{String: source_2.Offices[0].SedexId}
+	record.TilbagoKInfinityComAmt = sql.NullString{String: source_2.Offices[0].Amt, Valid: true}
+	record.TilbagoKInfinityComSedexId = sql.NullString{String: source_2.Offices[0].SedexId, Valid: true}
 	statement := `
     UPDATE records
     SET

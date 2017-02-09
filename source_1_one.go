@@ -20,16 +20,18 @@ func source_1_one(settings *Settings) {
 	var wait_group sync.WaitGroup
 	for _, typ := range Typs {
 		wait_group.Add(1)
-		go func(record Record, typ []string) {
-			defer wait_group.Done()
-			source_1_2, err := get_source_1(settings, record.Street, record.Number, record.Zip, record.City, typ)
-			if err != nil {
-				raven.CaptureErrorAndWait(err, nil)
-				panic(err)
-			}
-			fmt.Printf("%-27s Amt    : %s\n", typ[2], source_1_2.Amt)
-			fmt.Printf("%-27s SedexId: %s\n", typ[2], source_1_2.SedexId)
-		}(record, typ)
+		go source_1_one_goroutine(settings, record, typ, wait_group)
 	}
 	wait_group.Wait()
+}
+
+func source_1_one_goroutine(settings *Settings, record Record, typ []string, wait_group sync.WaitGroup) {
+	defer wait_group.Done()
+	source_1_2, err := get_source_1(settings, record.Street, record.Number, record.Zip, record.City, typ)
+	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
+		panic(err)
+	}
+	fmt.Printf("%-27s Amt    : %s\n", typ[2], source_1_2.Amt)
+	fmt.Printf("%-27s SedexId: %s\n", typ[2], source_1_2.SedexId)
 }

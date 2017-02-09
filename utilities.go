@@ -72,7 +72,7 @@ func get_settings() *Settings {
 }
 
 func get_source_1(
-	settings *Settings, street string, number string, zip string, city string, amt []string,
+	settings *Settings, street string, number string, zip string, city string, typ []string,
 ) (Source12, error) {
 	var source_1_1 Source11
 	var source_1_2 Source12
@@ -154,7 +154,7 @@ func get_source_1(
 	data_2.Add("addressObject[SprachCode]", Data.SprachCode)
 	data_2.Add("addressObject[Stadtkreis]", Data.Stadtkreis)
 	data_2.Add("addressObject[StrassenName]", Data.StrassenName)
-	data_2.Add("amtTyp", amt[1])
+	data_2.Add("amtTyp", typ[1])
 
 	request_2, new_request_2_err := http.NewRequest(
 		"POST",
