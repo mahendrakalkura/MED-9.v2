@@ -100,3 +100,10 @@ type Source2Office struct {
 	Amt     string `json:"amt"`
 	SedexId string `json:"sedexId"`
 }
+
+type Item struct {
+	source     string
+	completed  string
+	pending    string
+	percentage string
+}

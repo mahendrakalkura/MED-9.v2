@@ -76,57 +76,48 @@ func get_source_1(
 ) (Source12, error) {
 	var source_1_1 Source11
 	var source_1_2 Source12
-	var request *http.Request
-	var data url.Values
-	var response *http.Response
-	var path string
-	var xpath *xmlpath.Path
-	var value string
-	var ok bool
-	var err error
 
 	place := fmt.Sprintf("%s %s %s %s", street, number, zip, city)
 
 	client := get_http_client(settings)
 
-	data = url.Values{}
-	data.Add("action", "aemterfinden_suggestions")
-	data.Add("place", place)
+	data_1 := url.Values{}
+	data_1.Add("action", "aemterfinden_suggestions")
+	data_1.Add("place", place)
 
-	request, err = http.NewRequest(
+	request_1, new_request_1_err := http.NewRequest(
 		"POST",
 		"https://www.egeli-informatik.ch/prd/wp-admin/admin-ajax.php",
-		bytes.NewBufferString(data.Encode()),
+		bytes.NewBufferString(data_1.Encode()),
 	)
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
-		return source_1_2, errors.New("Error #1")
+	if new_request_1_err != nil {
+		raven.CaptureErrorAndWait(new_request_1_err, nil)
+		panic(new_request_1_err)
+		return source_1_2, errors.New("new_request_1_err")
 	}
 
-	request.Header.Add("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-	request.Header.Add("DNT", "1")
-	request.Header.Add("Host", "www.egeli-informatik.ch")
-	request.Header.Add("Origin", "https://www.egeli-informatik.ch")
-	request.Header.Add("Referer", "https://www.egeli-informatik.ch/unsere_loesungen/forderungsmanagement/aemterfinden/")
-	request.Header.Add("User-Agent", "Go")
-	request.Header.Add("X-Requested-With", "XMLHttpRequest")
+	request_1.Header.Add("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+	request_1.Header.Add("DNT", "1")
+	request_1.Header.Add("Host", "www.egeli-informatik.ch")
+	request_1.Header.Add("Origin", "https://www.egeli-informatik.ch")
+	request_1.Header.Add("Referer", "https://www.egeli-informatik.ch/unsere_loesungen/forderungsmanagement/aemterfinden/")
+	request_1.Header.Add("User-Agent", "Go")
+	request_1.Header.Add("X-Requested-With", "XMLHttpRequest")
 
-	response, err = client.Do(request)
-
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
-		return source_1_2, errors.New("Error #2")
+	response_1, do_1_err := client.Do(request_1)
+	if do_1_err != nil {
+		raven.CaptureErrorAndWait(do_1_err, nil)
+		panic(do_1_err)
+		return source_1_2, errors.New("do_1_err")
 	}
 
-	defer response.Body.Close()
+	defer response_1.Body.Close()
 
-	err = json.NewDecoder(response.Body).Decode(&source_1_1)
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
-		return source_1_2, errors.New("Error #3")
+	new_decoder_err := json.NewDecoder(response_1.Body).Decode(&source_1_1)
+	if new_decoder_err != nil {
+		raven.CaptureErrorAndWait(new_decoder_err, nil)
+		panic(new_decoder_err)
+		return source_1_2, errors.New("new_decoder_err")
 	}
 
 	if source_1_1.TotalHits == 0 {
@@ -143,81 +134,85 @@ func get_source_1(
 
 	Data := source_1_1.Data[0]
 
-	data = url.Values{}
-	data.Add("place", place)
-	data.Add("action", "aemterfinden_result")
-	data.Add("addressObject[Aktiv]", strconv.FormatBool(Data.Aktiv))
-	data.Add("addressObject[AlternativeSuchbegriffeAsSearchString]", Data.AlternativeSuchbegriffeAsSearchString)
-	data.Add("addressObject[AlternativeSuchbegriffeAsString]", Data.AlternativeSuchbegriffeAsString)
-	data.Add("addressObject[BfsNr]", Data.BfsNr)
-	data.Add("addressObject[HausKey]", strconv.Itoa(Data.HausKey))
-	data.Add("addressObject[HausNummer]", strconv.Itoa(Data.HausNummer))
-	data.Add("addressObject[HausNummerAlpha]", Data.HausNummerAlpha)
-	data.Add("addressObject[Kanton]", Data.Kanton)
-	data.Add("addressObject[Land]", Data.Land)
-	data.Add("addressObject[NameComplete]", Data.NameComplete)
-	data.Add("addressObject[Onrp]", Data.Onrp)
-	data.Add("addressObject[Ort]", Data.Ort)
-	data.Add("addressObject[Postleitzahl]", Data.Postleitzahl)
-	data.Add("addressObject[Quartier]", Data.Quartier)
-	data.Add("addressObject[SprachCode]", Data.SprachCode)
-	data.Add("addressObject[Stadtkreis]", Data.Stadtkreis)
-	data.Add("addressObject[StrassenName]", Data.StrassenName)
-	data.Add("amtTyp", amt[1])
+	data_2 := url.Values{}
+	data_2.Add("place", place)
+	data_2.Add("action", "aemterfinden_result")
+	data_2.Add("addressObject[Aktiv]", strconv.FormatBool(Data.Aktiv))
+	data_2.Add("addressObject[AlternativeSuchbegriffeAsSearchString]", Data.AlternativeSuchbegriffeAsSearchString)
+	data_2.Add("addressObject[AlternativeSuchbegriffeAsString]", Data.AlternativeSuchbegriffeAsString)
+	data_2.Add("addressObject[BfsNr]", Data.BfsNr)
+	data_2.Add("addressObject[HausKey]", strconv.Itoa(Data.HausKey))
+	data_2.Add("addressObject[HausNummer]", strconv.Itoa(Data.HausNummer))
+	data_2.Add("addressObject[HausNummerAlpha]", Data.HausNummerAlpha)
+	data_2.Add("addressObject[Kanton]", Data.Kanton)
+	data_2.Add("addressObject[Land]", Data.Land)
+	data_2.Add("addressObject[NameComplete]", Data.NameComplete)
+	data_2.Add("addressObject[Onrp]", Data.Onrp)
+	data_2.Add("addressObject[Ort]", Data.Ort)
+	data_2.Add("addressObject[Postleitzahl]", Data.Postleitzahl)
+	data_2.Add("addressObject[Quartier]", Data.Quartier)
+	data_2.Add("addressObject[SprachCode]", Data.SprachCode)
+	data_2.Add("addressObject[Stadtkreis]", Data.Stadtkreis)
+	data_2.Add("addressObject[StrassenName]", Data.StrassenName)
+	data_2.Add("amtTyp", amt[1])
 
-	request, err = http.NewRequest(
+	request_2, new_request_2_err := http.NewRequest(
 		"POST",
 		"https://www.egeli-informatik.ch/prd/wp-admin/admin-ajax.php",
-		bytes.NewBufferString(data.Encode()),
+		bytes.NewBufferString(data_2.Encode()),
 	)
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
-		return source_1_2, errors.New("Error #4")
+	if new_request_2_err != nil {
+		raven.CaptureErrorAndWait(new_request_2_err, nil)
+		panic(new_request_2_err)
+		return source_1_2, errors.New("new_request_2_err")
 	}
 
-	request.Header.Add("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-	request.Header.Add("DNT", "1")
-	request.Header.Add("Host", "www.egeli-informatik.ch")
-	request.Header.Add("Origin", "https://www.egeli-informatik.ch")
-	request.Header.Add("Referer", "https://www.egeli-informatik.ch/unsere_loesungen/forderungsmanagement/aemterfinden/")
-	request.Header.Add("User-Agent", "Go")
-	request.Header.Add("X-Requested-With", "XMLHttpRequest")
+	request_2.Header.Add("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+	request_2.Header.Add("DNT", "1")
+	request_2.Header.Add("Host", "www.egeli-informatik.ch")
+	request_2.Header.Add("Origin", "https://www.egeli-informatik.ch")
+	request_2.Header.Add("Referer", "https://www.egeli-informatik.ch/unsere_loesungen/forderungsmanagement/aemterfinden/")
+	request_2.Header.Add("User-Agent", "Go")
+	request_2.Header.Add("X-Requested-With", "XMLHttpRequest")
 
-	response, err = client.Do(request)
-
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
-		return source_1_2, errors.New("Error #5")
+	response_2, do_2_err := client.Do(request_2)
+	if do_2_err != nil {
+		raven.CaptureErrorAndWait(do_2_err, nil)
+		panic(do_2_err)
+		return source_1_2, errors.New("do_2_err")
 	}
 
-	defer response.Body.Close()
+	defer response_2.Body.Close()
 
-	body_bytes, err := ioutil.ReadAll(response.Body)
+	body_bytes, read_all_err := ioutil.ReadAll(response_2.Body)
+	if read_all_err != nil {
+		raven.CaptureErrorAndWait(read_all_err, nil)
+		panic(read_all_err)
+		return source_1_2, errors.New("read_all_err")
+	}
 
 	body_string := string(body_bytes)
 
 	reader := strings.NewReader(body_string)
-	root, err := xmlpath.ParseHTML(reader)
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
-		return source_1_2, errors.New("Error #6")
+	root, parse_html_err := xmlpath.ParseHTML(reader)
+	if parse_html_err != nil {
+		raven.CaptureErrorAndWait(parse_html_err, nil)
+		panic(parse_html_err)
+		return source_1_2, errors.New("parse_html_err")
 	}
 
-	path = `//li/div[@class="result"]/h2/text()`
-	xpath = xmlpath.MustCompile(path)
-	value, ok = xpath.String(root)
-	if ok {
-		source_1_2.Amt = get_text(value)
+	path_1 := `//li/div[@class="result"]/h2/text()`
+	xpath_1 := xmlpath.MustCompile(path_1)
+	value_1, ok_1 := xpath_1.String(root)
+	if ok_1 {
+		source_1_2.Amt = get_text(value_1)
 	}
 
-	path = `//li/div[@class="result"]/div[@class="column"]/p[@class="eschkg_id"]/text()`
-	xpath = xmlpath.MustCompile(path)
-	value, ok = xpath.String(root)
-	if ok {
-		source_1_2.SedexId = get_text(value)
+	path_2 := `//li/div[@class="result"]/div[@class="column"]/p[@class="eschkg_id"]/text()`
+	xpath_2 := xmlpath.MustCompile(path_2)
+	value_2, ok_2 := xpath_2.String(root)
+	if ok_2 {
+		source_1_2.SedexId = get_text(value_2)
 	}
 
 	return source_1_2, nil
@@ -225,15 +220,14 @@ func get_source_1(
 
 func get_source_2(settings *Settings, street string, number string, zip string, city string) (Source2, error) {
 	var source_2 Source2
-	var err error
 
 	client := get_http_client(settings)
 
-	request, err := http.NewRequest("GET", "http://tilbago.k-infinity.com:2607/dev/amtinfo", nil)
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
-		return source_2, errors.New("Error #1")
+	request, new_request_err := http.NewRequest("GET", "http://tilbago.k-infinity.com:2607/dev/amtinfo", nil)
+	if new_request_err != nil {
+		raven.CaptureErrorAndWait(new_request_err, nil)
+		panic(new_request_err)
+		return source_2, errors.New("new_request_err")
 	}
 
 	request.Header.Add("Host", "tilbago.k-infinity.com:2607")
@@ -246,20 +240,20 @@ func get_source_2(settings *Settings, street string, number string, zip string, 
 	query.Add("zip", zip)
 	request.URL.RawQuery = query.Encode()
 
-	response, err := client.Do(request)
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
-		return source_2, errors.New("Error #2")
+	response, do_err := client.Do(request)
+	if do_err != nil {
+		raven.CaptureErrorAndWait(do_err, nil)
+		panic(do_err)
+		return source_2, errors.New("do_err")
 	}
 
 	defer response.Body.Close()
 
-	err = json.NewDecoder(response.Body).Decode(&source_2)
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
-		return source_2, errors.New("Error #3")
+	new_decoder_err := json.NewDecoder(response.Body).Decode(&source_2)
+	if new_decoder_err != nil {
+		raven.CaptureErrorAndWait(new_decoder_err, nil)
+		panic(new_decoder_err)
+		return source_2, errors.New("new_decoder_err")
 	}
 
 	if len(source_2.Offices) == 0 {

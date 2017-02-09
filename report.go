@@ -1,12 +1,10 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/csv"
 	"fmt"
 	"github.com/charlesvdv/fuzmatch"
 	"github.com/getsentry/raven-go"
-	"github.com/jmoiron/sqlx"
 	"gopkg.in/cheggaaa/pb.v1"
 	"os"
 	"strconv"
@@ -17,61 +15,24 @@ func report(settings *Settings) {
 
 	database := get_database(settings)
 
-	var statement string
-	var row *sql.Row
-	var rows *sqlx.Rows
-	var count int
-	var record Record
-	var file *os.File
-	var ratios_amt int
-	var ratios_sedex_id int
-	var err error
-
-	statement = `
-    SELECT COUNT(id)
-    FROM records
-    WHERE
-        egeli_informatik_ch_co_amt != tilbago_k_infinity_com_amt
-        OR
-        egeli_informatik_ch_co_sedex_id != tilbago_k_infinity_com_sedex_id
-    `
-	row = database.QueryRow(statement)
-	err = row.Scan(&count)
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
-	}
-
-	if count == 0 {
+	total := records_select_report_total(database)
+	if total == 0 {
 		return
 	}
 
-	file, err = os.Create("ADR461-REPORT.CSV")
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
+	rows := records_select_report_records(database)
+
+	file, create_err := os.Create("ADR461-REPORT.CSV")
+	if create_err != nil {
+		raven.CaptureErrorAndWait(create_err, nil)
+		panic(create_err)
 	}
 
 	defer file.Close()
 
-	statement = `
-    SELECT *
-    FROM records
-    WHERE
-        egeli_informatik_ch_co_amt != tilbago_k_infinity_com_amt
-        OR
-        egeli_informatik_ch_co_sedex_id != tilbago_k_infinity_com_sedex_id
-    ORDER BY id ASC
-    `
-	rows, err = database.Queryx(statement)
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
-	}
-
 	writer := csv.NewWriter(file)
 
-	err = writer.Write(
+	write_err := writer.Write(
 		[]string{
 			"Street",
 			"Number",
@@ -85,19 +46,27 @@ func report(settings *Settings) {
 			"Sedex ID - Match %",
 		},
 	)
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
+	if write_err != nil {
+		raven.CaptureErrorAndWait(write_err, nil)
+		panic(write_err)
 	}
 
-	bar := pb.StartNew(count)
+	progress_bar := pb.StartNew(total)
 	for rows.Next() {
-		err = rows.StructScan(&record)
-		ratios_amt = fuzmatch.PartialRatio(record.EgeliInformatikChCoAmt.String, record.TilbagoKInfinityComAmt.String)
-		ratios_sedex_id = fuzmatch.PartialRatio(
+		var record Record
+		struct_scan_err := rows.StructScan(&record)
+		if struct_scan_err != nil {
+			raven.CaptureErrorAndWait(struct_scan_err, nil)
+			panic(struct_scan_err)
+		}
+
+		ratios_amt := fuzmatch.PartialRatio(record.EgeliInformatikChCoAmt.String, record.TilbagoKInfinityComAmt.String)
+
+		ratios_sedex_id := fuzmatch.PartialRatio(
 			record.EgeliInformatikChCoSedexId.String, record.TilbagoKInfinityComSedexId.String,
 		)
-		err := writer.Write(
+
+		write_err := writer.Write(
 			[]string{
 				record.Street,
 				record.Number,
@@ -111,11 +80,12 @@ func report(settings *Settings) {
 				strconv.Itoa(ratios_sedex_id),
 			},
 		)
-		if err != nil {
-			raven.CaptureErrorAndWait(err, nil)
-			panic(err)
+		if write_err != nil {
+			raven.CaptureErrorAndWait(write_err, nil)
+			panic(write_err)
 		}
-		bar.Increment()
+
+		progress_bar.Increment()
 	}
 
 	defer writer.Flush()

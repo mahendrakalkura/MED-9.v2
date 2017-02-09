@@ -5,46 +5,117 @@ import (
 	"fmt"
 	"github.com/getsentry/raven-go"
 	"github.com/jmoiron/sqlx"
+	"strconv"
 )
 
-func source_1_select_all(database *sqlx.DB, typ string) (int, []Record) {
-	var statement string
-	var row *sql.Row
-	var count int
-	var records []Record
-	var err error
+func records_select_total(database *sqlx.DB) int64 {
+	statement := `SELECT COUNT(id) FROM records`
+	row := database.QueryRow(statement)
+	var total int64
+	err := row.Scan(&total)
+	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
+		panic(err)
+	}
+	return total
+}
 
-	statement = `
-    SELECT COUNT(id) AS count
+func records_select_report_total(database *sqlx.DB) int {
+	statement := `
+    SELECT COUNT(id)
+    FROM records
+    WHERE
+        egeli_informatik_ch_co_amt != tilbago_k_infinity_com_amt
+        OR
+        egeli_informatik_ch_co_sedex_id != tilbago_k_infinity_com_sedex_id
+    `
+	row := database.QueryRow(statement)
+	var total int
+	err := row.Scan(&total)
+	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
+		panic(err)
+	}
+	return total
+}
+
+func records_select_report_records(database *sqlx.DB) *sqlx.Rows {
+	statement := `
+    SELECT *
+    FROM records
+    WHERE
+        egeli_informatik_ch_co_amt != tilbago_k_infinity_com_amt
+        OR
+        egeli_informatik_ch_co_sedex_id != tilbago_k_infinity_com_sedex_id
+    ORDER BY id ASC
+    `
+	rows, err := database.Queryx(statement)
+	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
+		panic(err)
+	}
+	return rows
+}
+
+func source_1_select_progress(database *sqlx.DB, typ []string, total int64) (string, string, string, string) {
+	source := fmt.Sprintf("#1 - %s (%s)", typ[2], typ[1])
+
+	query := `
+    SELECT COUNT(id)
     FROM records
     WHERE egeli_informatik_ch_%s_amt IS NULL AND egeli_informatik_ch_%s_sedex_id IS NULL
     `
-	statement = fmt.Sprintf(statement, typ[0], typ[0])
-	row = database.QueryRow(statement)
-	err = row.Scan(&count)
+	statement := fmt.Sprintf(query, typ[0], typ[0])
+	row := database.QueryRow(statement)
+	var pending int64
+	err := row.Scan(&pending)
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
 		panic(err)
 	}
 
-	statement = `
+	pending_string := fmt.Sprintf("%07s", strconv.FormatInt(pending, 10))
+
+	completed := total - pending
+	completed_string := fmt.Sprintf("--%07s", strconv.FormatInt(completed, 10))
+
+	percentage := (float64(completed) * 100.00) / (float64(total) * 1.00)
+	percentage_string := fmt.Sprintf("---%06.2f%%", percentage)
+
+	return source, completed_string, pending_string, percentage_string
+}
+
+func source_1_select_all(database *sqlx.DB, typ string) (int64, *sqlx.Rows) {
+	query_total := `
+    SELECT COUNT(id)
+    FROM records
+    WHERE egeli_informatik_ch_%s_amt IS NULL AND egeli_informatik_ch_%s_sedex_id IS NULL
+    `
+	statement_total := fmt.Sprintf(query_total, typ[0], typ[0])
+	row_total := database.QueryRow(statement_total)
+	var total int64
+	err_total := row_total.Scan(&total)
+	if err_total != nil {
+		raven.CaptureErrorAndWait(err_total, nil)
+		panic(err_total)
+	}
+
+	query_star := `
     SELECT *
     FROM records
     WHERE egeli_informatik_ch_%s_amt IS NULL AND egeli_informatik_ch_%s_sedex_id IS NULL
     ORDER BY id ASC
     `
-	statement = fmt.Sprintf(statement, typ[0], typ[0])
-	err = database.Select(&records, statement)
+	statement_star := fmt.Sprintf(query_star, typ[0], typ[0])
+	rows, err := database.Queryx(statement_star)
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
 		panic(err)
 	}
-
-	return count, records
+	return total, rows
 }
 
 func source_1_select_one(database *sqlx.DB) Record {
-	var record Record
 	statement := `
     SELECT *
     FROM records
@@ -53,58 +124,7 @@ func source_1_select_one(database *sqlx.DB) Record {
     LIMIT 1
     OFFSET 0
     `
-	err := database.Get(&record, statement)
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
-	}
-	return record
-}
-
-func source_2_select_all(database *sqlx.DB) (int, []Record) {
-	var statement string
-	var row *sql.Row
-	var count int
-	var records []Record
-	var err error
-
-	statement = `
-    SELECT COUNT(id) AS count
-    FROM records
-    WHERE tilbago_k_infinity_com_amt IS NULL AND tilbago_k_infinity_com_sedex_id IS NULL
-    `
-	row = database.QueryRow(statement)
-	err = row.Scan(&count)
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
-	}
-
-	statement = `
-    SELECT *
-    FROM records
-    WHERE tilbago_k_infinity_com_amt IS NULL AND tilbago_k_infinity_com_sedex_id IS NULL
-    ORDER BY id ASC
-    `
-	err = database.Select(&records, statement)
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
-	}
-
-	return count, records
-}
-
-func source_2_select_one(database *sqlx.DB) Record {
 	var record Record
-	statement := `
-    SELECT *
-    FROM records
-    WHERE tilbago_k_infinity_com_amt IS NULL AND tilbago_k_infinity_com_sedex_id IS NULL
-    ORDER BY RANDOM()
-    LIMIT 1
-    OFFSET 0
-    `
 	err := database.Get(&record, statement)
 	if err != nil {
 		raven.CaptureErrorAndWait(err, nil)
@@ -171,6 +191,79 @@ func source_1_update(database *sqlx.DB, typ []string, record Record, source_1_2 
     `
 	statement = fmt.Sprintf(statement, typ[0], typ[0])
 	database.NamedExec(statement, record)
+}
+
+func source_2_select_progress(database *sqlx.DB, total int64) (string, string, string, string) {
+	source := "#2"
+
+	statement := `
+    SELECT COUNT(id)
+    FROM records
+    WHERE tilbago_k_infinity_com_amt IS NULL AND tilbago_k_infinity_com_sedex_id IS NULL
+    `
+	row := database.QueryRow(statement)
+	var pending int64
+	err := row.Scan(&pending)
+	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
+		panic(err)
+	}
+
+	pending_string := fmt.Sprintf("%07s", strconv.FormatInt(pending, 10))
+
+	completed := total - pending
+	completed_string := fmt.Sprintf("--%07s", strconv.FormatInt(completed, 10))
+
+	percentage := (float64(completed) * 100.00) / (float64(total) * 1.00)
+	percentage_string := fmt.Sprintf("---%06.2f%%", percentage)
+
+	return source, completed_string, pending_string, percentage_string
+}
+
+func source_2_select_all(database *sqlx.DB) (int64, *sqlx.Rows) {
+	statement_total := `
+    SELECT COUNT(id)
+    FROM records
+    WHERE tilbago_k_infinity_com_amt IS NULL AND tilbago_k_infinity_com_sedex_id IS NULL
+    `
+	row_total := database.QueryRow(statement_total)
+	var total int64
+	err_total := row_total.Scan(&total)
+	if err_total != nil {
+		raven.CaptureErrorAndWait(err_total, nil)
+		panic(err_total)
+	}
+
+	statement_star := `
+    SELECT *
+    FROM records
+    WHERE tilbago_k_infinity_com_amt IS NULL AND tilbago_k_infinity_com_sedex_id IS NULL
+    ORDER BY id ASC
+    `
+	rows, err := database.Queryx(statement_star)
+	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
+		panic(err)
+	}
+	return total, rows
+}
+
+func source_2_select_one(database *sqlx.DB) Record {
+	statement := `
+    SELECT *
+    FROM records
+    WHERE tilbago_k_infinity_com_amt IS NULL AND tilbago_k_infinity_com_sedex_id IS NULL
+    ORDER BY RANDOM()
+    LIMIT 1
+    OFFSET 0
+    `
+	var record Record
+	err := database.Get(&record, statement)
+	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
+		panic(err)
+	}
+	return record
 }
 
 func source_2_update(database *sqlx.DB, record Record, source_2 Source2) {

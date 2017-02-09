@@ -16,19 +16,23 @@ func insert(settings *Settings) {
 
 	database := get_database(settings)
 
-	transaction, err := database.Begin()
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
+	transaction, begin_err := database.Begin()
+	if begin_err != nil {
+		raven.CaptureErrorAndWait(begin_err, nil)
+		panic(begin_err)
 	}
 
-	statement, err := transaction.Prepare(pq.CopyIn("records", "zip", "city", "street", "number"))
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
+	statement, prepare_err := transaction.Prepare(pq.CopyIn("records", "zip", "city", "street", "number"))
+	if prepare_err != nil {
+		raven.CaptureErrorAndWait(prepare_err, nil)
+		panic(prepare_err)
 	}
 
-	file, _ := os.Open("ADR461.CSV")
+	file, open_err := os.Open("ADR461.CSV")
+	if open_err != nil {
+		raven.CaptureErrorAndWait(open_err, nil)
+		panic(open_err)
+	}
 
 	stat, stat_err := file.Stat()
 	if stat_err != nil {
@@ -36,40 +40,37 @@ func insert(settings *Settings) {
 		panic(stat_err)
 	}
 
-	bar := pb.New(int(stat.Size())).SetUnits(pb.U_BYTES)
-	bar.Start()
-	proxy := bar.NewProxyReader(file)
-	buffer := bufio.NewReader(proxy)
-	resource := csv.NewReader(buffer)
-	resource.Comma = ';'
-	resource.Read()
+	progress_bar := pb.New(int(stat.Size())).SetUnits(pb.U_BYTES)
+	progress_bar.Start()
+
+	proxy_reader := progress_bar.NewProxyReader(file)
+
+	buffer_reader := bufio.NewReader(proxy_reader)
+
+	csv_reader := csv.NewReader(buffer_reader)
+	csv_reader.Comma = ';'
+	csv_reader.Read()
 	for {
-		record, err := resource.Read()
-		if err == io.EOF {
+		record, read_err := csv_reader.Read()
+		if read_err == io.EOF {
 			break
 		}
-		_, err = statement.Exec(record[0], record[1], record[2], record[3])
-		if err != nil {
-			raven.CaptureErrorAndWait(err, nil)
-			panic(err)
+		_, exec_err := statement.Exec(record[0], record[1], record[2], record[3])
+		if exec_err != nil {
+			raven.CaptureErrorAndWait(exec_err, nil)
+			panic(exec_err)
 		}
 	}
 
-	_, err = statement.Exec()
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
+	close_err := statement.Close()
+	if close_err != nil {
+		raven.CaptureErrorAndWait(close_err, nil)
+		panic(close_err)
 	}
 
-	err = statement.Close()
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
-	}
-
-	err = transaction.Commit()
-	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
-		panic(err)
+	commit_err := transaction.Commit()
+	if commit_err != nil {
+		raven.CaptureErrorAndWait(commit_err, nil)
+		panic(commit_err)
 	}
 }

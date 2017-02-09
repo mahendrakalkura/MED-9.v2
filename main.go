@@ -10,9 +10,7 @@ func main() {
 
 	flag.Parse()
 
-	var settings *Settings
-
-	settings = get_settings()
+	settings := get_settings()
 
 	raven.SetDSN(settings.Sentry.Dsn)
 
