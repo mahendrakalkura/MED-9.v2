@@ -11,3 +11,6 @@ hostname = "0.0.0.0"
 password = "..."
 port = "5432"
 username = "..."
+
+[others]
+consumers = 16
