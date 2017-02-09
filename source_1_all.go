@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/getsentry/raven-go"
+	"github.com/jmoiron/sqlx"
 	"gopkg.in/cheggaaa/pb.v1"
 	"os"
 	"os/signal"
@@ -15,11 +16,13 @@ func source_1_all(settings *Settings) {
 	signal_channel := make(chan os.Signal)
 	records_and_typs_channel := make(chan RecordAndTyp, settings.Others.Consumers*2)
 
+	database := get_database(settings)
+
 	for index := 1; index <= settings.Others.Consumers; index++ {
-		go source_1_all_consumer(settings, records_and_typs_channel)
+		go source_1_all_consumer(settings, database, records_and_typs_channel)
 	}
 
-	go source_1_all_producer(settings, records_and_typs_channel)
+	go source_1_all_producer(database, records_and_typs_channel)
 
 	signal.Notify(signal_channel, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM)
 
@@ -28,7 +31,7 @@ func source_1_all(settings *Settings) {
 	close(records_and_typs_channel)
 }
 
-func source_1_all_consumer(settings *Settings, records_and_typs_channel chan RecordAndTyp) {
+func source_1_all_consumer(settings *Settings, database *sqlx.DB, records_and_typs_channel chan RecordAndTyp) {
 	for record_and_typ := range records_and_typs_channel {
 		record := record_and_typ.Record
 		typ := record_and_typ.Typ
@@ -36,14 +39,12 @@ func source_1_all_consumer(settings *Settings, records_and_typs_channel chan Rec
 		if err != nil {
 			raven.CaptureErrorAndWait(err, nil)
 		} else {
-			database := get_database(settings)
 			source_1_update(database, typ, record, source_2)
 		}
 	}
 }
 
-func source_1_all_producer(settings *Settings, records_and_typs_channel chan RecordAndTyp) {
-	database := get_database(settings)
+func source_1_all_producer(database *sqlx.DB, records_and_typs_channel chan RecordAndTyp) {
 	for _, typ := range Typs {
 		total, rows := source_1_select_all(database, typ)
 		progress_bar := pb.StartNew(total)
