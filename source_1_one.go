@@ -6,6 +6,8 @@ import (
 	"sync"
 )
 
+var wait_group sync.WaitGroup
+
 func source_1_one(settings *Settings) {
 	fmt.Println("source_1_one()")
 
@@ -17,15 +19,14 @@ func source_1_one(settings *Settings) {
 	fmt.Printf("%-35s: %s\n", "City", record.City)
 	fmt.Printf("%-35s: %s\n", "Zip", record.Zip)
 
-	var wait_group sync.WaitGroup
+	wait_group.Add(len(Typs))
 	for _, typ := range Typs {
-		wait_group.Add(1)
-		go source_1_one_goroutine(settings, record, typ, wait_group)
+		go source_1_one_goroutine(settings, record, typ)
 	}
 	wait_group.Wait()
 }
 
-func source_1_one_goroutine(settings *Settings, record Record, typ []string, wait_group sync.WaitGroup) {
+func source_1_one_goroutine(settings *Settings, record Record, typ []string) {
 	defer wait_group.Done()
 	source_1_2, err := get_source_1(settings, record.Street, record.Number, record.Zip, record.City, typ)
 	if err != nil {
